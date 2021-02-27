@@ -1,0 +1,28 @@
+spring:
+  h2:
+    console:
+      enabled: true
+  datasource:
+    url: jdbc:h2:mem:userdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    show-sql: true
+
+kakao:
+  key: 05ae70aff8bc0cb4ba853b59f56de492
+naver:
+  client-id: UXsG9qgyKHoQrXtpCCpX
+  client-secret: 3hh5uTa4Mo
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: '*'
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
