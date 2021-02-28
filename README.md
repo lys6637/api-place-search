@@ -32,7 +32,7 @@ Open API : Kakao API(키워드로 장소검색 / 이미지검색), Naver API(지
 ### curl 을 통한 기능 실행
 #### 장소 검색
 ```shell
-$ curl "http://localhost:8080/place?keyword=olympic&pageSize=1&currentPage=1" 
+$ curl "http://localhost:8080/place?keyword=kakao&pageSize=10&currentPage=1" 
 ```
 keyword= 검색어입력(필수)  
 pageSize= 한 페이지에 보여지는 데이터 갯수  

@@ -1,5 +1,5 @@
 ### 키워드로 장소 검색
-GET http://localhost:8080/place?keyword=olympic&pageSize=5&currentPage=1
+GET http://localhost:8080/place?keyword=kakao&pageSize=10&currentPage=1
 Accept: application/json
 
 ### Top10 인기검색어 검색
