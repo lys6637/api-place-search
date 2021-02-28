@@ -25,6 +25,12 @@ public class NaverApi {
     @Value("${naver.client-secret}")
     private String clientSecrect;
 
+    @Value("${naver.maxSize}")
+    private int maxSize;
+
+    @Value("${naver.maxPage}")
+    private int maxPage;
+
     private static final String API_SERVER_HOST = "https://openapi.naver.com";
     private static final String SEARCH_PLACE_KEYWORD_PATH = "/v1/search/local.json";
     private static final String SEARCH_IMAGE_PATH = "/v1/search/image";
@@ -32,15 +38,23 @@ public class NaverApi {
     @HystrixCommand(fallbackMethod = "searchAPIFallback", commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
             @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "3"),
             @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "5000")})
-    public LinkedHashMap getSearchByKeyword(SearchVo searchVo) throws Exception {
+    public LinkedHashMap getNaverSearchByKeyword(SearchVo searchVo) throws Exception {
         LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>();
+
+        int start = Integer.parseInt(searchVo.getCurrentPage());
+        int display = Integer.parseInt(searchVo.getPageSize());
+
+        if(start < 1) start=1;
+        else if(start > maxPage) start=maxPage;
+        if(display < 1) display=1;
+        else if(display > maxSize) display=maxSize;
 
         HttpComponentsClientHttpRequestFactory factory = new HttpComponentsClientHttpRequestFactory();
         factory.setConnectTimeout(5000); //타임아웃 설정 5초
         factory.setReadTimeout(5000);//타임아웃 설정 5초
         RestTemplate restTemplate = new RestTemplate();
 
-        String queryString = "?query=" + URLEncoder.encode(searchVo.getKeyword(), "UTF-8") + "&start=" + searchVo.getCurrentPage() + "&display=" + searchVo.getPageSize();
+        String queryString = "?query=" + URLEncoder.encode(searchVo.getKeyword(), "UTF-8") + "&start=" + start + "&display=" + display;
         HttpHeaders headers = new HttpHeaders();
         headers.add("X-Naver-Client-Id", clientID);
         headers.add("X-Naver-Client-Secret", clientSecrect);
@@ -53,6 +67,9 @@ public class NaverApi {
         //body 부분만 추출
         result = (LinkedHashMap) re.getBody();
 
+        result.put("currentPage", start);
+        result.put("pageSize", display);
+
         return result;
     }
 
@@ -60,7 +77,7 @@ public class NaverApi {
             commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
                     @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "3"),
                     @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "5000")})
-    public ArrayList<String> getImageByKeyword(String title) throws Exception {
+    public ArrayList<String> getNaverImageByKeyword(String title) throws Exception {
         ArrayList<String> result = new ArrayList<String>();
 
         String queryString = "?query=" + URLEncoder.encode(title, "UTF-8") + "&display=3&start=1";

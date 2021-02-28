@@ -36,23 +36,23 @@ public class SearchService {
         String keyword = searchVo.getKeyword();
 
         // Keyword로 검색하기 & meta 재조립
-        searchBody = kakaoApiHelper.getSearchByKeyword(searchVo); //Kakao API 호출
+        searchBody = kakaoApiHelper.getKakaoSearchByKeyword(searchVo); //Kakao API 호출
 
         if (searchBody == null) {
             isKakaoSearchAPI = false;
-            searchBody = naverApiHelper.getSearchByKeyword(searchVo); // Kakao 장애시 Naver API 호출
+            searchBody = naverApiHelper.getNaverSearchByKeyword(searchVo); // Kakao 장애시 Naver API 호출
             searchedPlaces = (ArrayList<Map>) searchBody.get("items");
             newMeta.put("totalPages", 1); // Naver 검색 API는 page를 1개만 제공하기 때문에 1로 고정
             newMeta.put("totalElements", searchBody.get("total"));
-            newMeta.put("pageSize", searchBody.get("display"));
-            newMeta.put("currentPage", searchBody.get("start"));
+            newMeta.put("pageSize", searchBody.get("pageSize"));
+            newMeta.put("currentPage", searchBody.get("currentPage"));
         } else {
             searchedPlaces = (ArrayList<Map>) searchBody.get("documents");
             LinkedHashMap<String, Object> meta = (LinkedHashMap<String, Object>) searchBody.get("meta");
             newMeta.put("totalPages", meta.get("pageable_count"));
             newMeta.put("totalElements", meta.get("total_count"));
-            newMeta.put("pageSize", searchVo.getPageSize());
-            newMeta.put("currentPage", searchVo.getCurrentPage());
+            newMeta.put("pageSize", searchBody.get("pageSize"));
+            newMeta.put("currentPage", searchBody.get("currentPage"));
         }
         newMeta.put("keyword", keyword);
 
@@ -65,7 +65,7 @@ public class SearchService {
 
         for (Map obj : searchedPlaces) {
             String title = (String) obj.get(imgSearchKey);
-            ArrayList<String> imageUrls = kakaoApiHelper.getImageByKeyword(title);
+            ArrayList<String> imageUrls = kakaoApiHelper.getKakoImageByKeyword(title);
             if (imageUrls == null) {
                 isKakaoImgAPI = false;
                 break;
@@ -81,7 +81,7 @@ public class SearchService {
                 String title = (String) obj.get(imgSearchKey);
                 title = title.replaceAll("<b>", "");
                 title = title.replaceAll("</b>", "");
-                ArrayList<String> imageUrls = naverApiHelper.getImageByKeyword(title); //Kakao Img API 장애시 Naver API 호출
+                ArrayList<String> imageUrls = naverApiHelper.getNaverImageByKeyword(title); //Kakao Img API 장애시 Naver API 호출
                 if (imageUrls == null) break;
                 Map<String, Object> place = new HashMap<String, Object>();
                 place.put("imageUrls", imageUrls);

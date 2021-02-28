@@ -23,6 +23,12 @@ public class KakaoApi {
     @Value("${kakao.key}")
     private String restApiKey;
 
+    @Value("${kakao.maxSize}")
+    private int maxSize;
+
+    @Value("${kakao.maxPage}")
+    private int maxPage;
+
     @Autowired
     RestTemplate restTemplate;
 
@@ -39,10 +45,18 @@ public class KakaoApi {
             commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
                     @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "3"),
                     @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "5000")})
-    public LinkedHashMap getSearchByKeyword(SearchVo searchVo) throws Exception {
+    public LinkedHashMap getKakaoSearchByKeyword(SearchVo searchVo) throws Exception {
         LinkedHashMap<String, Object> result = new LinkedHashMap<String, Object>();
 
-        String queryString = "?query=" + URLEncoder.encode(searchVo.getKeyword(), "UTF-8") + "&page=" + searchVo.getCurrentPage() + "&size=" + searchVo.getPageSize();
+        int currentPage = Integer.parseInt(searchVo.getCurrentPage());
+        int pageSize = Integer.parseInt(searchVo.getPageSize());
+
+        if(currentPage < 1) currentPage=1;
+        else if(currentPage > maxPage) currentPage=maxPage;
+        if(pageSize < 1) pageSize=1;
+        else if(pageSize > maxSize) pageSize=maxSize;
+
+        String queryString = "?query=" + URLEncoder.encode(searchVo.getKeyword(), "UTF-8") + "&page=" + currentPage + "&size=" + pageSize;
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "KakaoAK " + restApiKey);
         headers.add("Accept", MediaType.APPLICATION_JSON_VALUE);
@@ -54,7 +68,9 @@ public class KakaoApi {
 
         //body 부분만 추출
         result = (LinkedHashMap) re.getBody();
-        result.put("statusCode", re.getStatusCodeValue());
+
+        result.put("currentPage", currentPage);
+        result.put("pageSize", pageSize);
 
         return result;
     }
@@ -63,7 +79,7 @@ public class KakaoApi {
             commandProperties = {@HystrixProperty(name = "execution.isolation.thread.timeoutInMilliseconds", value = "3000"),
                     @HystrixProperty(name = "circuitBreaker.requestVolumeThreshold", value = "3"),
                     @HystrixProperty(name = "metrics.rollingStats.timeInMilliseconds", value = "5000")})
-    public ArrayList<String> getImageByKeyword(String title) throws Exception {
+    public ArrayList<String> getKakoImageByKeyword(String title) throws Exception {
         ArrayList<String> result = new ArrayList<String>();
 
         String queryString = null;

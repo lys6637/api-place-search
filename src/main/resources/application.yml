@@ -13,10 +13,14 @@ spring:
     show-sql: true
 
 kakao:
-  key: 05ae70aff8bc0cb4ba853b59f56de492
+  key: {INPUT-YOUR-API-KEY}
+  maxPage: 45
+  maxSize: 15
 naver:
-  client-id: UXsG9qgyKHoQrXtpCCpX
-  client-secret: 3hh5uTa4Mo
+  client-id: {INPUT-YOUR-API-KEY}
+  client-secret: {INPUT-YOUR-API-KEY}
+  maxPage: 1
+  maxSize: 5
 
 hystrix:
   dashboard:

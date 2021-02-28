@@ -22,8 +22,12 @@ public class SearchController {
         }
 
         try {
-            if (StringUtils.hasText(searchVo.getKeyword())) Integer.parseInt(searchVo.getCurrentPage());
-            if (StringUtils.hasText(searchVo.getKeyword())) Integer.parseInt(searchVo.getPageSize());
+            if (StringUtils.hasText(searchVo.getKeyword())) {
+                Integer.parseInt(searchVo.getCurrentPage());
+            }
+            if (StringUtils.hasText(searchVo.getKeyword())) {
+                Integer.parseInt(searchVo.getPageSize());
+            }
         } catch (NumberFormatException ne) {
             throw new NumberFormatException("페이지는 숫자로 입력해주세요.");
         }
